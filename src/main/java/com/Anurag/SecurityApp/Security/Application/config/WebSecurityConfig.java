@@ -25,6 +25,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/posts").permitAll() //only posts page is public for everyone and not other then is public you have to login in first
                         .requestMatchers("posts/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated())
+                .csrf(csrfConfig -> csrfConfig.disable())
                 .formLogin(Customizer.withDefaults());
 
 
