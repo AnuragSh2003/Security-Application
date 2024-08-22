@@ -2,7 +2,9 @@ package com.Anurag.SecurityApp.Security.Application.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -22,7 +24,7 @@ public class WebSecurityConfig {
 
         httpSecurity
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/posts").permitAll() //only posts page is public for everyone and not other then is public you have to login in first
+                        .requestMatchers("/posts","/error","/auth/**").permitAll() //only posts page is public for everyone and not other then is public you have to login in first
                         .requestMatchers("posts/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated())
                 .csrf(csrfConfig -> csrfConfig.disable())
@@ -33,21 +35,26 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    UserDetailsService myInMemoryUserDetailsService(){
-        UserDetails normalUser = User
-                .withUsername("anurag")
-                .password(passwordEncoder().encode("Pass123"))
-                .roles("USER")
-                .build();
-
-        UserDetails adminUser  = User
-                .withUsername("admin")
-                .password(passwordEncoder().encode("admin"))
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(normalUser , adminUser);
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{
+        return config.getAuthenticationManager();
     }
+
+//    @Bean
+//    UserDetailsService myInMemoryUserDetailsService(){
+//        UserDetails normalUser = User
+//                .withUsername("anurag")
+//                .password(passwordEncoder().encode("Pass123"))
+//                .roles("USER")
+//                .build();
+//
+//        UserDetails adminUser  = User
+//                .withUsername("admin")
+//                .password(passwordEncoder().encode("admin"))
+//                .roles("ADMIN")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(normalUser , adminUser);
+//    }
 
     @Bean
     PasswordEncoder passwordEncoder(){
