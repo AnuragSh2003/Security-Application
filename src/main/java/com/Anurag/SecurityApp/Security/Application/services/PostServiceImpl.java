@@ -2,15 +2,19 @@ package com.Anurag.SecurityApp.Security.Application.services;
 
 import com.Anurag.SecurityApp.Security.Application.dto.PostDTO;
 import com.Anurag.SecurityApp.Security.Application.entities.PostEntity;
+import com.Anurag.SecurityApp.Security.Application.entities.User;
 import com.Anurag.SecurityApp.Security.Application.exceptions.ResourceNotFoundException;
 import com.Anurag.SecurityApp.Security.Application.repositories.PostRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostServices{
@@ -36,6 +40,11 @@ public class PostServiceImpl implements PostServices{
 
 
     public PostDTO getPostById(Long postId) {
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        log.info("user {}",user);
+
         PostEntity postEntity = postRepository
                 .findById(postId)
                 .orElseThrow(()->new ResourceNotFoundException("Post Not found By Id "+postId));
