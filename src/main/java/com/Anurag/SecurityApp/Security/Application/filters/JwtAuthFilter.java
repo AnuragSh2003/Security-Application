@@ -24,21 +24,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        try{
+            final String requestTokenHeader = request.getHeader("Authorization");
+            if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            String token = requestTokenHeader.split("Bearer ")[1];
 
-        final String requestTokenHeader = request.getHeader("Authorization");
-        if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer")){
-            filterChain.doFilter(request,response);
-            return;
+            Long userId = jwtService.getUserIdFromToken(token);
+
+            if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                User user = userService.getUserById(userId);
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, null);
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
+            filterChain.doFilter(request, response);
+        }catch (Exception exception) {
+            throw new RuntimeException(exception);
         }
-        String token = requestTokenHeader.split("Bearer ")[1];
-
-        Long userId = jwtService.getUserIdFromToken(token);
-
-        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            User user = userService.getUserById(userId);
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user,null,null);
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        }
-        filterChain.doFilter(request,response);
     }
 }
