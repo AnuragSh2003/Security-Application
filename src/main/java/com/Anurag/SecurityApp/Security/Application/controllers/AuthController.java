@@ -37,8 +37,6 @@ public class AuthController {
         Cookie cookie = new Cookie("token",token);
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
-
-
         return ResponseEntity.ok(token);
     }
 

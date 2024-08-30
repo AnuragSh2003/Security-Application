@@ -20,8 +20,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public  ResponseEntity<ApiError> handleAuthenticationException(AuthenticationException ex){
-        ApiError apiError = new ApiError(ex.getLocalizedMessage(),HttpStatus.UNAUTHORIZED);
-        return new ResponseEntity<>(apiError,HttpStatus.UNAUTHORIZED);
+        ApiError apiError = new ApiError(ex.getLocalizedMessage(), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(apiError, HttpStatus.UNAUTHORIZED);
     }
 
 }

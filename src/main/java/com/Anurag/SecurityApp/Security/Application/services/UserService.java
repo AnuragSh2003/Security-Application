@@ -1,6 +1,5 @@
 package com.Anurag.SecurityApp.Security.Application.services;
 
-import com.Anurag.SecurityApp.Security.Application.dto.LoginDto;
 import com.Anurag.SecurityApp.Security.Application.dto.SignUpDto;
 import com.Anurag.SecurityApp.Security.Application.dto.UserDto;
 import com.Anurag.SecurityApp.Security.Application.entities.User;
@@ -8,10 +7,7 @@ import com.Anurag.SecurityApp.Security.Application.exceptions.ResourceNotFoundEx
 import com.Anurag.SecurityApp.Security.Application.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,7 +27,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username)
-                .orElseThrow(()->new BadCredentialsException("User with email "+ username+"not found"));
+                .orElseThrow(() -> new BadCredentialsException("User with email "+ username +" not found"));
     }
 
     public User getUserById(Long userId){
@@ -39,10 +35,14 @@ public class UserService implements UserDetailsService {
 
     }
 
+    public User getUsrByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
     public UserDto signUp(SignUpDto signUpDto) {
         Optional<User> user = userRepository.findByEmail(signUpDto.getEmail());
         if(user.isPresent()){
-            throw new BadCredentialsException("User  with email already exits"+ signUpDto.getEmail());
+            throw new BadCredentialsException(STR."User  with email already exits\{signUpDto.getEmail()}");
         }
         User toBeCreatedUser = modelMapper.map(signUpDto,User.class);
         toBeCreatedUser.setPassword(passwordEncoder.encode(toBeCreatedUser.getPassword()));
@@ -50,8 +50,6 @@ public class UserService implements UserDetailsService {
         User savedUser =  userRepository.save(toBeCreatedUser);
         return modelMapper.map(savedUser,UserDto.class);
     }
-
-
 }
 
 

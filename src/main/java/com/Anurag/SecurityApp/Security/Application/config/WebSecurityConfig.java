@@ -32,13 +32,13 @@ public class WebSecurityConfig {
         httpSecurity
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/posts","/error","/auth/**").permitAll() //only posts page is public for everyone and not other then is public you have to login in first
-//                        .requestMatchers("posts/**").hasAnyRole("ADMIN")
+                        .requestMatchers("posts/**").hasAnyRole("ADMIN")
                         .anyRequest().authenticated())
                 .csrf(csrfConfig -> csrfConfig.disable())
                 .sessionManagement(sessionConfig -> sessionConfig
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(Customizer.withDefaults());
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+//                .formLogin(Customizer.withDefaults());
 
 
         return httpSecurity.build();
