@@ -4,14 +4,13 @@ import com.Anurag.SecurityApp.Security.Application.dto.LoginDto;
 import com.Anurag.SecurityApp.Security.Application.dto.LoginResponseDto;
 import com.Anurag.SecurityApp.Security.Application.dto.SignUpDto;
 import com.Anurag.SecurityApp.Security.Application.dto.UserDto;
-import com.Anurag.SecurityApp.Security.Application.entities.User;
 import com.Anurag.SecurityApp.Security.Application.services.AuthService;
 import com.Anurag.SecurityApp.Security.Application.services.UserService;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +27,9 @@ public class AuthController {
     private final UserService userService;
     private final AuthService authService;
 
+    @Value("${deploy.evn}")
+    private String deployEnv;
+
     @PostMapping("/signup")
     public ResponseEntity<UserDto> signUp(@RequestBody SignUpDto signUpDto){
         UserDto  userDto = userService.signUp(signUpDto);
@@ -40,6 +42,7 @@ public class AuthController {
 
         Cookie cookie = new Cookie("refreshToken",loginResponseDto.getRefreshToken());
         cookie.setHttpOnly(true);
+        cookie.setSecure("production".equals(deployEnv));
         response.addCookie(cookie);
         return ResponseEntity.ok(loginResponseDto);
     }

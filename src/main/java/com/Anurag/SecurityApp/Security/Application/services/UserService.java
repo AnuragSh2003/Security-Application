@@ -35,7 +35,7 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public User getUsrByEmail(String email) {
+    public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
     }
 
@@ -49,6 +49,10 @@ public class UserService implements UserDetailsService {
 
         User savedUser =  userRepository.save(toBeCreatedUser);
         return modelMapper.map(savedUser,UserDto.class);
+    }
+
+    public User save(User newUser){
+        return userRepository.save(newUser);
     }
 }
 
