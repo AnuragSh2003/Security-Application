@@ -1,10 +1,12 @@
 package com.Anurag.SecurityApp.Security.Application.config;
 
+import com.Anurag.SecurityApp.Security.Application.entities.enums.Role;
 import com.Anurag.SecurityApp.Security.Application.filters.JwtAuthFilter;
 import com.Anurag.SecurityApp.Security.Application.handlers.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
@@ -22,6 +24,9 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.Anurag.SecurityApp.Security.Application.entities.enums.Role.ADMIN;
+import static com.Anurag.SecurityApp.Security.Application.entities.enums.Role.CREATOR;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -29,14 +34,18 @@ public class WebSecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private static final String[] publicRoutes = {
+            "/error","/auth/**","/home.html"
+    };
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)throws Exception{
 
         httpSecurity
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/posts","/error","/auth/**","/home.html").permitAll() //only posts page is public for everyone and not other then is public you have to login in first
-//                        .requestMatchers("posts/**").hasAnyRole("ADMIN")
+                        .requestMatchers(publicRoutes).permitAll() //only posts page is public for everyone and not other then is public you have to login in first
+                        .requestMatchers(HttpMethod.GET,"/posts/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/posts/**").hasAnyRole(ADMIN.name(), CREATOR.name())
                         .anyRequest().authenticated())
                 .csrf(csrfConfig -> csrfConfig.disable())
                 .sessionManagement(sessionConfig -> sessionConfig
