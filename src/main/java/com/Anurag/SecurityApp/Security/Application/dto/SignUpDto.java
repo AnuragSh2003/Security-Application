@@ -1,5 +1,6 @@
 package com.Anurag.SecurityApp.Security.Application.dto;
 
+import com.Anurag.SecurityApp.Security.Application.entities.enums.Permission;
 import com.Anurag.SecurityApp.Security.Application.entities.enums.Role;
 import lombok.Data;
 
@@ -13,5 +14,6 @@ public class SignUpDto {
     private String password;
     private String name;
     private Set<Role> roles;
+    private Set<Permission> permissions;
 
 }

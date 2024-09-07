@@ -1,5 +1,6 @@
 package com.Anurag.SecurityApp.Security.Application.config;
 
+import com.Anurag.SecurityApp.Security.Application.entities.enums.Permission;
 import com.Anurag.SecurityApp.Security.Application.entities.enums.Role;
 import com.Anurag.SecurityApp.Security.Application.filters.JwtAuthFilter;
 import com.Anurag.SecurityApp.Security.Application.handlers.OAuth2SuccessHandler;
@@ -24,6 +25,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.Anurag.SecurityApp.Security.Application.entities.enums.Permission.*;
 import static com.Anurag.SecurityApp.Security.Application.entities.enums.Role.ADMIN;
 import static com.Anurag.SecurityApp.Security.Application.entities.enums.Role.CREATOR;
 
@@ -46,6 +48,14 @@ public class WebSecurityConfig {
                         .requestMatchers(publicRoutes).permitAll() //only posts page is public for everyone and not other then is public you have to login in first
                         .requestMatchers(HttpMethod.GET,"/posts/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/posts/**").hasAnyRole(ADMIN.name(), CREATOR.name())
+                        .requestMatchers(HttpMethod.POST,"/posts/**")
+                            .hasAnyAuthority(POST_CREATE.name())
+                        .requestMatchers(HttpMethod.GET,"/posts/**")
+                            .hasAuthority(POST_VIEW.name())
+                        .requestMatchers(HttpMethod.PUT,"/posts/**").hasAuthority(POST_UPDATE.name())
+                        .requestMatchers(HttpMethod.DELETE,"/posts/**").hasAuthority(POST_DELETE.name())
+
+
                         .anyRequest().authenticated())
                 .csrf(csrfConfig -> csrfConfig.disable())
                 .sessionManagement(sessionConfig -> sessionConfig

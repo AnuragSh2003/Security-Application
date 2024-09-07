@@ -1,6 +1,8 @@
 package com.Anurag.SecurityApp.Security.Application.entities;
 
+import com.Anurag.SecurityApp.Security.Application.entities.enums.Permission;
 import com.Anurag.SecurityApp.Security.Application.entities.enums.Role;
+import com.Anurag.SecurityApp.Security.Application.utils.PermissionMapping;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -8,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,11 +34,18 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_"+role.name()))
-                .collect(Collectors.toSet());
+        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+        roles.forEach(
+                role -> {
+                    Set<SimpleGrantedAuthority> permissions = PermissionMapping.getAuthoritiesForReal(role);
+                    authorities.addAll(permissions);
+                    authorities.add(new SimpleGrantedAuthority("ROLE_"+role.name()));
+                }
+        );
+        return authorities;
     }
 
     @Override
